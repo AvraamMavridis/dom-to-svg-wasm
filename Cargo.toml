@@ -1,7 +1,7 @@
 [package]
 name = "rustpdf"
 version = "0.1.0"
-authors = ["hindenbug <manoj.mk27@gmail.com>"]
+authors = ["Avraam Mavridis <avraammauridis@gmail.com>"]
 edition = "2018"
 
 [lib]
@@ -22,4 +22,12 @@ features = [
   'SvgElement',
   'HtmlElement',
   'Node',
+  'CssStyleSheet',
+  'StyleSheet',
+  'DomStringList',
+  'ShadowRoot',
+  'StyleSheetList',
+  'CssGroupingRule', 
+  'CssRuleList',
+  'CssRule'
 ]
