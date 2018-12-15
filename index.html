@@ -30,6 +30,20 @@
     div {
       background: green;
     }
+
+  p.a {
+  font: 15px arial, sans-serif;
+}
+
+p.b {
+  font: italic bold 12px/30px Georgia, serif;
+}
+
+@font-face {
+  font-family: 'MyWebFont';
+  src:  url('myfont.woff2') format('woff2'),
+        url('myfont.woff') format('woff');
+}
   </style>
 </head>
 
@@ -38,6 +52,8 @@
 
   <div id="paok">
     Paok
+
+    <div>dsd</div>
   </div>
 
   <canvas id="canvas" width="150" height="150"></canvas>

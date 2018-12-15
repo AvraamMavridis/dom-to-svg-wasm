@@ -38,12 +38,12 @@ fn get_css_rules(document: &web_sys::Document) -> Vec<web_sys::CssRule> {
     return document_css_rules;
 }
 
-fn get_font_face_rules(rules: &Vec<web_sys::CssRule>) -> Vec<&web_sys::CssRule> {
+fn get_font_face_rules(rules: &Vec<web_sys::CssRule>) -> Vec<web_sys::CssFontFaceRule> {
     let mut font_rules = Vec::new();
 
    rules.iter().for_each(|x| {
        if(x.type_() == web_sys::CssRule::FONT_FACE_RULE) {
-           font_rules.push(x);
+           font_rules.push(CssFontFaceRule::from(JsValue::from(x)));
        }
    });
 
