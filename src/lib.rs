@@ -41,13 +41,23 @@ fn get_css_rules(document: &web_sys::Document) -> Vec<web_sys::CssRule> {
 fn get_font_face_rules(rules: &Vec<web_sys::CssRule>) -> Vec<web_sys::CssFontFaceRule> {
     let mut font_rules = Vec::new();
 
-   rules.iter().for_each(|x| {
-       if(x.type_() == web_sys::CssRule::FONT_FACE_RULE) {
-           font_rules.push(CssFontFaceRule::from(JsValue::from(x)));
+   rules.iter().for_each(|rule| {
+       if(rule.type_() == web_sys::CssRule::FONT_FACE_RULE) {
+           font_rules.push(CssFontFaceRule::from(JsValue::from(rule)));
        }
    });
 
     return font_rules;
+}
+
+fn get_fonts_sources(font_rules: &Vec<web_sys::CssFontFaceRule>) -> Vec<String> {
+    let mut font_sources = Vec::new();
+
+    font_rules.iter().for_each(|rule| {
+        font_sources.push(rule.style().get_property_value("src").unwrap());
+    });
+
+    return font_sources;
 }
 
 // Export a `greet` function from Rust to JavaScript, that alerts a
@@ -74,9 +84,10 @@ pub fn draw(node: &web_sys::HtmlElement) {
 
     log("Take document styless");
     let rules = get_css_rules(&document);
-    get_font_face_rules(&rules);
+    let font_rules = get_font_face_rules(&rules);
+    let font_sources = get_fonts_sources(&font_rules);
 
-    log(&rules.len().to_string());
+    log(&font_sources.len().to_string());
 
 
     body.append_child(&_svg);
