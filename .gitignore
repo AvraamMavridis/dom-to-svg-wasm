@@ -1,0 +1,9 @@
+/target
+**/*.rs.bk
+Cargo.lock
+node_modules/
+build
+*.d.ts
+*.wasm
+rustpdf.js
+

@@ -1,0 +1,25 @@
+[package]
+name = "rustpdf"
+version = "0.1.0"
+authors = ["hindenbug <manoj.mk27@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+js-sys = "0.3.6"
+wasm-bindgen = "0.2.29"
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  'CanvasRenderingContext2d',
+  'Document',
+  'Element',
+  'HtmlCanvasElement',
+  'Window',
+  'SvgElement',
+  'HtmlElement',
+  'Node',
+]
