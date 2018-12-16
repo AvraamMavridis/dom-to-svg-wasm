@@ -31,5 +31,7 @@ features = [
   'CssRuleList',
   'CssRule',
   'CssFontFaceRule',
-  'CssStyleDeclaration'
+  'CssStyleDeclaration',
+  'NodeList',
+  'XmlSerializer'
 ]

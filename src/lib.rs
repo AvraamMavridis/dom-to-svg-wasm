@@ -38,6 +38,37 @@ fn get_css_rules(document: &web_sys::Document) -> Vec<web_sys::CssRule> {
     return document_css_rules;
 }
 
+fn copy_css(original_element: &web_sys::HtmlElement, target: &web_sys::HtmlElement) {
+    let window = web_sys::window().unwrap();
+    let computed_style = window.get_computed_style(original_element);
+    target.style().set_css_text(&computed_style.unwrap().unwrap().css_text());
+}
+
+fn inline_styles(original_element: &web_sys::HtmlElement, target: &web_sys::HtmlElement) {
+    // let document = web_sys::window().unwrap().document().unwrap();
+    let original_children = original_element.query_selector_all("*");
+    let target_children = target.query_selector_all("*");
+    let unwrap_target_children = target_children.unwrap();
+    let unwrap_original_children = original_children.unwrap();
+    let len = unwrap_original_children.length();
+
+    // let original_arr = Array::from(&original_children.unwrap());
+    // let target_children_arr = Array::from(&target_children.unwrap());
+
+    copy_css(original_element, target);
+
+    let mut x = 0;
+    {
+        if x < len {
+            let original_child = HtmlElement::from(JsValue::from(unwrap_original_children.item(x).unwrap()));
+            let target_child = HtmlElement::from(JsValue::from(unwrap_target_children.item(x).unwrap()));
+            copy_css(&original_child, &target_child);
+            x += 1;
+        }
+    }
+
+}
+
 fn get_font_face_rules(rules: &Vec<web_sys::CssRule>) -> Vec<web_sys::CssFontFaceRule> {
     let mut font_rules = Vec::new();
 
@@ -88,6 +119,11 @@ pub fn draw(node: &web_sys::HtmlElement) {
     let font_sources = get_fonts_sources(&font_rules);
 
     log(&font_sources.len().to_string());
+
+    let target_element = HtmlElement::from(JsValue::from(node.clone_node().unwrap()));
+    inline_styles(node, &target_element);
+
+    let xml_serializer = web_sys::XmlSerializer::new();
 
 
     body.append_child(&_svg);
