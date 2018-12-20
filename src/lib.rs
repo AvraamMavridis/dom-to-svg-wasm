@@ -1,7 +1,89 @@
+use futures::{future, Future};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen_futures::future_to_promise;
+use wasm_bindgen_futures::JsFuture;
 use web_sys::*;
+use web_sys::{Request, RequestInit, RequestMode, Response};
 use js_sys::*;
+
+struct HtmlToImage {}
+
+impl HtmlToImage {
+
+    fn inline(&self, node: &web_sys::HtmlElement, clone: &web_sys::HtmlElement) -> Promise {
+        let children = node.children();
+        let clone_children = clone.children();
+        let mut inline_chilren_promises: Vec<Promise> = Vec::new();
+
+        let src_url = clone.get_attribute("src").unwrap();
+
+        return Promise::new(&mut |resolve, _reject| {
+            self.encode_url_as_content(&src_url);
+        });
+
+        // if (src_url) {
+        //     let src_content = await! 
+        // }
+
+        log(&src_url);
+
+        log(&clone_children.length().to_string());
+    }
+
+    fn encode_url_as_content(&self, url: &str) -> Promise {
+        let mut opts = RequestInit::new();
+        opts.method("GET");
+        opts.mode(RequestMode::Cors);
+
+        let request = Request::new_with_str_and_init(
+            url,
+            &opts,
+        )
+        .unwrap();
+
+        let window = web_sys::window().unwrap();
+        let request_promise = window.fetch_with_request(&request);
+
+
+        let future = JsFuture::from(request_promise)
+            .and_then(|resp_value| {
+                // `resp_value` is a `Response` object.
+                // assert!(resp_value.is_instance_of::<Response>());
+                let resp: Response = resp_value.dyn_into().unwrap();
+                resp.blob()
+            })
+            .and_then(|blob: Promise| {
+                // Convert this other `Promise` into a rust `Future`.
+                JsFuture::from(blob)
+            })
+            .and_then(|res| {
+                let reader = FileReader::new().unwrap();
+                let onloadend = Closure::wrap(Box::new(move || {
+                    let p = reader.result().unwrap();
+                    p.as_string().unwrap().split(",");
+                }) as Box<dyn FnMut()>);
+
+
+                reader.set_onloadend(Some(JsValue::from(onloadend.as_ref())));
+
+
+                future::ok(JsValue::from(res))
+            });
+
+        return future_to_promise(future);
+    } 
+
+    fn get_node_dimensions(&self, node: &web_sys::HtmlElement) -> DomRect{
+        return node.get_bounding_client_rect();
+    }
+
+    fn asSvg(&self, node: &web_sys::HtmlElement) {
+        let rect = self.get_node_dimensions(node);
+        let clone = HtmlElement::from(JsValue::from(node.clone_node_with_deep(true).unwrap()));
+        self.inline(node, &clone);
+    }
+}
 
 #[wasm_bindgen]
 extern "C" {
@@ -113,19 +195,24 @@ pub fn draw(node: &web_sys::HtmlElement) {
     _svg.set_attribute("viewBox",  &viewbox);
 
 
-    log("Take document styless");
-    let rules = get_css_rules(&document);
-    let font_rules = get_font_face_rules(&rules);
-    let font_sources = get_fonts_sources(&font_rules);
+    let mut html_to_image: HtmlToImage  = HtmlToImage {};
 
-    log(&font_sources.len().to_string());
-
-    let target_element = HtmlElement::from(JsValue::from(node.clone_node().unwrap()));
-    inline_styles(node, &target_element);
-
-    let xml_serializer = web_sys::XmlSerializer::new();
+    html_to_image.asSvg(node);
 
 
-    body.append_child(&_svg);
+    // log("Take document styless");
+    // let rules = get_css_rules(&document);
+    // let font_rules = get_font_face_rules(&rules);
+    // let font_sources = get_fonts_sources(&font_rules);
+
+    // log(&font_sources.len().to_string());
+
+    // let target_element = HtmlElement::from(JsValue::from(node.clone_node().unwrap()));
+    // inline_styles(node, &target_element);
+
+    // let xml_serializer = web_sys::XmlSerializer::new();
+
+
+    // body.append_child(&_svg);
 
 }
