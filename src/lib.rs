@@ -65,7 +65,7 @@ impl HtmlToImage {
                 }) as Box<dyn FnMut()>);
 
 
-                reader.set_onloadend(Some(JsValue::from(onloadend.as_ref())));
+                // reader.set_onloadend(Some(JsValue::from(onloadend.as_ref())));
 
 
                 future::ok(JsValue::from(res))
